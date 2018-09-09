@@ -1,0 +1,4 @@
+,templates_id,templates_name,templates_location,templates_timezone,templates_description,templates_noOfPackets,templates_timePeriod,templates_dataSource,templates_login,templates_pwd,templates_MQTTTopic,templates_unity,templates_datagroups
+0,5a92e7e068f5c63170004683,template 11,"(36.8992047, 10.187515200000007)",UTC-12:00,['description'],['noOfPackets'],['timePeriod'],['dataSource'],['login'],['pwd'],['MQTTTopic'],['unity'],['datagroups']
+1,5ae8596568f5c63b000052e4,test,"(36.8992047, 10.187515200000007)",UTC-10:00,['description'],['noOfPackets'],['timePeriod'],['dataSource'],['login'],['pwd'],['MQTTTopic'],['unity'],['datagroups']
+2,5b07121d68f5c62fd0005cc2,iii,"(36.8992047, 10.187515200000007)",UTC-10:00,['description'],['noOfPackets'],['timePeriod'],['dataSource'],['login'],['pwd'],['MQTTTopic'],['unity'],['datagroups']

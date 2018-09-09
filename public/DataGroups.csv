@@ -1,0 +1,2 @@
+,DataGroups_id,DataGroups_name,DataGroups_description,DataGroups_accuracy,DataGroups_time_period,DataGroups_time_unit,DataGroups_action,DataGroups_datatypes
+0,5a92e59668f5c63170004682,groupe 1,this is a description for groupe 1,2,['time_period'],['time_unit'],['action'],['datatypes']

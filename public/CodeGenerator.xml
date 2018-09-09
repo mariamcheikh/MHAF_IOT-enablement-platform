@@ -1,0 +1,343 @@
+<codeGen>
+<import>
+#include &lt;Wire.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;mpr121.h&gt;
+#include "rgb_lcd.h"
+#include "U8glib.h"
+#include &lt;dht11.h&gt;
+dht11 DHT;
+#define DHT11_PIN 4
+</import>
+
+<declaration>
+  <lcd>
+    rgb_lcd lcd;
+  </lcd>
+  <lcd2>
+    U8GLIB_NHD_C12864 u8g(13, 11, 10, 9, 8); // SPI Com: SCK = 13, MOSI = 11, CS = 10, CD = 9, RST = 8
+  </lcd2>
+  <touch>
+    int ledPin = 13; // Connect LED on pin 13
+    int touchPin = 1; // Connect Touch sensor on Digital Pin 1
+  </touch>
+  <WheelPad>
+    int WheelPad = 0;
+  </WheelPad>
+  <KeyPad>
+    int keyPad = 0
+  </KeyPad>
+  <TouchPad>
+    int TouchPadX ;           // X-coordinate
+    int TouchPadY ;           // Y-coordinate
+  </TouchPad>
+  <temperature>
+    int tempPin = A0; // Connect Temperature sensor on Analog Pin 0
+    const int B = 3975;
+  </temperature>
+  <light>
+    int pinLight = A1; // Connect Light sensor on Analog Pin 1
+  </light>
+  <lightDisc>
+    int B = 3; //Connect Blue led to Digital pin 3
+    int R = 5;//Connect Red led to Digital pin 5
+    int G = 6;//Connect Green led to Digital pin 6
+  </lightDisc>
+  <buzzer>
+    int buzzPin =  2; // Connect Buzzer on Digital Pin 2
+  </buzzer>
+  <sound>
+    int pinSound = A2; // Connect Sound sensor on Analog Pin 2
+  </sound>
+</declaration>
+
+<lcd2draw>
+  void draw(void) {
+  // graphic commands to redraw the complete screen should be placed here  
+  u8g.setFont(u8g_font_unifont);
+  //u8g.setFont(u8g_font_osb21);
+  u8g.drawStr( 0, 20, "www.DFRobot.com");
+}
+</lcd2draw>
+
+<setup>
+  <signature>
+    void setup()
+    {
+  </signature>
+  <begin>
+          Serial.begin(9600); // open serial port, set the baud rate to 9600 bps
+  </begin>
+  <buzzer>
+          pinMode(buzzPin, OUTPUT);  // Initialize pin mode of buzzPin 
+  </buzzer>
+  <touch>
+          pinMode(touchPin, INPUT);  // Initialize pin mode of touchPin 
+  </touch>
+  <WheelPad>
+          //  initialize function for WheelPad
+          Wire.begin();
+          CapaTouch.begin();
+          delay(500);
+  </WheelPad>
+  <keyPad>
+          //  initialize function for keyPad
+          Wire.begin();
+          CapaTouch.begin();
+          delay(500);
+  </keyPad>
+  <TouchPad>
+          //  initialize function for TouchPad
+          Wire.begin();
+          CapaTouch.begin();
+          delay(500);
+  </TouchPad>
+  <lightDisc>
+          //   Light Disc
+          pinMode(3,OUTPUT);
+          pinMode(5,OUTPUT);
+          pinMode(6,OUTPUT);
+  </lightDisc>
+  <lcd>
+          // Initialize LCD
+          lcd.begin(16, 2);
+          lcd.setRGB(255, 255, 255);
+  </lcd>
+  <lcd2>
+          u8g.setContrast(0); // Config the contrast to the best effect
+          u8g.setRot180();// rotate screen, if required
+          // set SPI backup if required
+          //u8g.setHardwareBackup(u8g_backup_avr_spi);
+
+          // assign default color value
+          if ( u8g.getMode() == U8G_MODE_R3G3B2 ) {
+            u8g.setColorIndex(255);     // white
+          }
+          else if ( u8g.getMode() == U8G_MODE_GRAY2BIT ) {
+            u8g.setColorIndex(3);         // max intensity
+          }
+          else if ( u8g.getMode() == U8G_MODE_BW ) {
+            u8g.setColorIndex(1);         // pixel on
+          }
+          else if ( u8g.getMode() == U8G_MODE_HICOLOR ) {
+            u8g.setHiColorByRGB(255,255,255);
+          }
+  </lcd2>
+  <close>
+    }
+  </close>
+</setup>
+
+<loop>
+  <signature>
+    void loop()
+    {
+  </signature>
+  <sound>
+
+          //////////// Sound Sensor ////////////
+          int soundVal = analogRead(pinSound);   //Get value from Sound sensor
+          Serial.println(soundVal,DEC); //print the sound value to serial        
+          delay(100);
+  </sound>
+  <buzzer>
+          /////////////// Buzzer ///////////////
+          digitalWrite(buzzPin, HIGH);
+          delay(1);
+          digitalWrite(buzzPin, LOW); 
+          delay(1); 
+  </buzzer>
+  <light>
+          //////////// Light Sensor ////////////
+          int lightVal = analogRead(pinLight);   //Get value from Light sensor
+          Serial.println(lightVal,DEC);//print the value to serial        
+          delay(100);
+  </light>
+  <lightDisc>
+          ///////////// Light Disc /////////////
+          analogWrite(B,random(255));  
+          analogWrite(R,random(255));  
+          analogWrite(G,random(255));
+          delay(80); 
+  </lightDisc>
+  <temperature>
+          ///////// Temperature Sensor /////////
+          int val = analogRead(tempPin);  //Get value from Temperature sensor
+          // Determine the current resistance of the thermistor based on the sensor value.
+          float resistance = (float)(1023-val)*10000/val; 
+          // Calculate the temperature based on the resistance value.
+          float temperature = 1/(log(resistance/10000)/B+1/298.15)-273.15;
+  </temperature>
+  <humidity>
+
+          ////// Temperature and Humidity //////
+          int chk;
+          Serial.print("DHT11, \t");
+          chk = DHT.read(DHT11_PIN);    // READ DATA
+          switch (chk){
+            case DHTLIB_OK:  
+                        Serial.print("OK,\t"); 
+                        break;
+            case DHTLIB_ERROR_CHECKSUM: 
+                        Serial.print("Checksum error,\t"); 
+                        break;
+            case DHTLIB_ERROR_TIMEOUT: 
+                        Serial.print("Time out error,\t"); 
+                        break;
+            default: 
+                        Serial.print("Unknown error,\t"); 
+                        break;
+          }
+         // DISPLAT DATA
+          Serial.print(DHT.humidity,1);
+          Serial.print(",\t");
+          Serial.println(DHT.temperature,1);
+         
+          delay(1000);
+  </humidity>
+  <touch>
+
+          //////////// Touch Sensor ////////////
+          if(digitalRead(KEY)==HIGH) {      //Read Touch sensor signal
+            digitalWrite(ledPin, HIGH);   // if Touch sensor is HIGH, then turn on the led
+          }
+          else{
+            digitalWrite(ledPin, LOW);    // if Touch sensor is LOW, then turn off the led
+          }
+  </touch>
+  <WheelPad>
+
+          ////////////// WheelPad //////////////
+          WheelPad=CapaTouch.keyPad();
+         
+          if (key==1)             
+          { Serial.print("wheel:");
+            Serial.println("0");
+          }
+           if (key==4)
+          { Serial.print("wheel:");
+            Serial.println("1");
+          }
+           if (key==7)
+          { Serial.print("wheel:");
+            Serial.println("2");
+          }
+           if (key==11)
+          { Serial.print("wheel:");
+            Serial.println("3");
+          }
+           if (key==2)
+          { Serial.print("wheel:");
+            Serial.println("4");
+          }
+           if (key==5)
+          { Serial.print("wheel:");
+            Serial.println("5");
+          }
+          
+           if (key==8)
+          { Serial.print("wheel:");
+            Serial.println("6");
+          }
+           if (key==0)
+          { Serial.print("wheel:");
+            Serial.println("7");
+          }
+           if (key==3)
+          { Serial.print("wheel:");
+            Serial.println("8");
+          }
+          delay(200);
+  </WheelPad>
+  <KeyPad>
+          /////////////// KeyPad ///////////////
+          keyPad=CapaTouch.keyPad();
+            if (key==1)             
+          { Serial.print("key:");
+            Serial.println("0");
+          }
+           if (key==4)
+          { Serial.print("key:");
+            Serial.println("1");
+          }
+           if (key==7)
+          { Serial.print("key:");
+            Serial.println("2");
+          }
+           if (key==11)
+          { Serial.print("key:");
+            Serial.println("3");
+          }
+           if (key==2)
+          { Serial.print("key:");
+            Serial.println("4");
+          }
+           if (key==5)
+          { Serial.print("key:");
+            Serial.println("5");
+          }
+          
+           if (key==8)
+          { Serial.print("key:");
+            Serial.println("6");
+          }
+           if (key==0)
+          { Serial.print("key:");
+            Serial.println("7");
+          }
+           if (key==3)
+          { Serial.print("key:");
+            Serial.println("8");
+          }
+           if (key==10)
+          { Serial.print("key:");
+            Serial.println("*");
+          }
+           if(key==12)
+          {
+            Serial.print("key:");
+            Serial.println("#");
+          }
+           if(key>=0){
+            Serial.print("key:"); 
+            Serial.println(key); 
+          }
+          delay(200);
+  </KeyPad>
+  <TouchPad>
+
+          ////////////// TouchPad //////////////
+          TouchPadX=CapaTouch.getX();              // Get X position.
+          TouchPadY=CapaTouch.getY();              // Get Y position.
+          if(X&gt;=1&amp;&amp;X&lt;=9&amp;&amp;Y&gt;=1&amp;&amp;Y&lt;=13)
+           {                                 // Determine whether in the range.If not,do nothing.
+              Serial.print("X=");
+              Serial.print(X);
+              Serial.print("  Y=");
+              Serial.println(Y); 
+           }
+          delay(200);
+  </TouchPad>
+  <lcd>
+          ///////////////// LCD /////////////////
+          lcd.clear();  
+          lcd.print("MHAF-IOT");
+  </lcd>
+  <lcd2>
+          ///////////////// LCD /////////////////
+          // picture loop
+          u8g.firstPage();  
+          do {
+            draw();
+          } 
+          while( u8g.nextPage() );
+
+          // rebuild the picture after some delay
+          delay(500);
+  </lcd2>
+  <close>
+    }
+  </close>
+</loop>
+
+</codeGen>
